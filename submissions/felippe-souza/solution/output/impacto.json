@@ -1,0 +1,18 @@
+{
+  "mrr_perdido_regime": 990451.0,
+  "contratos_perdidos_regime": 387,
+  "excesso_mrr": 648230.888384961,
+  "excesso_pct": 0.6544805228981152,
+  "perda_3m_atual": 555776.7828601692,
+  "perda_3m_metade": 417238.6393476925,
+  "perda_3m_antigo": 272734.609803245,
+  "mrr_vendido_dez": 2273427.0,
+  "sobrevivencia_90d_atual": 0.8749124163595022,
+  "sobrevivencia_90d_antigo": 0.9751644971466106,
+  "ganho_por_safra": 227915.78726759338,
+  "contas_50pct": 81,
+  "contas_80pct": 222,
+  "mrr_ativo": 10159608.0,
+  "mrr_ate_90d": 4384297.0,
+  "risco_30d": 272665.0
+}

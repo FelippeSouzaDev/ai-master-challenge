@@ -249,41 +249,89 @@ def risk_list(acc, sub, after):
     return g, act
 
 
+# Paleta validada com dataviz/scripts/validate_palette.js (modo claro, superfície #fcfcfb).
+INK, INK_2, MUTED, GRID, AXIS, SURFACE = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7", "#fcfcfb"
+BEFORE, AFTER = "#2a78d6", "#e34948"  # antes de ago/24 / desde ago/24
+SERIES3 = ["#2a78d6", "#eb6834", "#1baf7a"]
+
+
+def _style(ax, title, subtitle=None):
+    ax.set_facecolor(SURFACE)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.spines["bottom"].set_color(AXIS)
+    ax.tick_params(colors=MUTED, length=0, labelsize=9)
+    ax.yaxis.grid(True, color=GRID, linewidth=0.8)
+    ax.set_axisbelow(True)
+    ax.set_title(title, loc="left", fontsize=12, fontweight="semibold", color=INK, pad=22 if subtitle else 10)
+    if subtitle:
+        ax.text(0, 1.03, subtitle, transform=ax.transAxes, fontsize=9, color=INK_2)
+
+
+
 def charts(trend, before, after, paradox, tix_scores):
-    plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
-    # 1. tendência
-    fig, ax = plt.subplots(figsize=(8, 3.6))
-    t = trend[trend.mes >= "2023-10"]
-    ax.bar(t.mes, t.churn_mrr_pct, color=["#b91c1c" if m >= "2024-08" else "#9ca3af" for m in t.mes])
-    ax.set_ylabel("% do MRR ativo perdido no mês")
-    ax.set_title("Churn de receita por mês: a alta começa em ago/24")
-    ax.tick_params(axis="x", rotation=60)
-    fig.tight_layout(); fig.savefig(OUT / "g1_tendencia.png", dpi=150); plt.close(fig)
+    plt.rcParams.update({"font.family": ["Segoe UI", "DejaVu Sans"], "figure.facecolor": SURFACE,
+                         "savefig.facecolor": SURFACE})
+
+    # 1. tendência mensal
+    t = trend[trend.mes >= "2023-10"].reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(8, 3.8))
+    x = np.arange(len(t))
+    colors = [AFTER if m >= "2024-08" else BEFORE for m in t.mes]
+    ax.bar(x, t.churn_mrr_pct, width=0.55, color=colors, linewidth=0)
+    for i in (t.index[t.mes == "2024-07"][0], len(t) - 1):
+        ax.text(i, t.churn_mrr_pct[i] + 0.12, f"{t.churn_mrr_pct[i]:.1f}%".replace(".", ","), ha="center",
+                fontsize=9, color=INK, fontweight="semibold")
+    meses = "jan fev mar abr mai jun jul ago set out nov dez".split()
+    labels = [f"{meses[pd.Period(m).month - 1]}/{m[2:4]}" for m in t.mes]
+    ax.set_xticks(x, labels, rotation=0, fontsize=8)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
+    _style(ax, "Churn de receita por mês", "% do MRR ativo perdido no mês · azul: até jul/24 · vermelho: desde ago/24")
+    fig.tight_layout(); fig.savefig(OUT / "g1_tendencia.png", dpi=170); plt.close(fig)
+
     # 2. idade x período
-    fig, ax = plt.subplots(figsize=(8, 3.6))
+    fig, ax = plt.subplots(figsize=(8, 3.8))
     x = np.arange(len(AGE_BANDS))
     r0 = [before[b][1] / before[b][0] * 30 * 100 for b in AGE_BANDS]
     r1 = [after[b][1] / after[b][0] * 30 * 100 for b in AGE_BANDS]
-    ax.bar(x - 0.2, r0, 0.4, label="jan/23 a jul/24", color="#9ca3af")
-    ax.bar(x + 0.2, r1, 0.4, label="ago/24 a dez/24", color="#b91c1c")
+    w = 0.3
+    ax.bar(x - w / 2 - 0.01, r0, w, color=BEFORE, linewidth=0, label="jan/23 a jul/24")
+    ax.bar(x + w / 2 + 0.01, r1, w, color=AFTER, linewidth=0, label="desde ago/24")
     for i, (a, b) in enumerate(zip(r0, r1)):
-        ax.text(i + 0.2, b + 0.15, f"{b / a:.1f}x", ha="center", fontsize=9)
-    ax.set_xticks(x, BAND_LABELS); ax.set_ylabel("% de contratos encerrados por mês")
-    ax.set_title("A alta está nos contratos novos; a base madura não mudou")
-    ax.legend(frameon=False)
-    fig.tight_layout(); fig.savefig(OUT / "g2_idade.png", dpi=150); plt.close(fig)
-    # 3. paradoxo
-    fig, axes = plt.subplots(1, 2, figsize=(8, 3.2))
-    for col, lab, color in [("contas", "contas", "#9ca3af"), ("uso_total", "uso total", "#1f2937"),
-                            ("uso_por_conta", "uso por conta", "#b91c1c")]:
-        axes[0].plot(paradox.trimestre, paradox[col] / paradox[col].iloc[0] * 100, marker="o", label=lab, color=color)
-    axes[0].set_yscale("log"); axes[0].set_ylabel("índice, 2023Q1 = 100 (log)")
-    axes[0].set_title("Base 9x maior, uso total igual"); axes[0].legend(frameon=False, fontsize=8)
-    axes[0].tick_params(axis="x", rotation=60)
+        ax.text(i + w / 2, b + 0.18, f"{b:.1f}%".replace(".", ","), ha="center", fontsize=9, color=INK, fontweight="semibold")
+        ax.text(i - w / 2, a + 0.18, f"{a:.1f}%".replace(".", ","), ha="center", fontsize=8, color=INK_2)
+    ax.text(0 + w / 2 + 0.22, r1[0] * 0.55, f"{r1[0] / r0[0]:.0f}x", fontsize=20, fontweight="bold", color=INK)
+    ax.set_xticks(x, BAND_LABELS, fontsize=9)
+    ax.set_ylim(0, max(r1) * 1.15)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
+    ax.legend(frameon=False, fontsize=9, loc="upper right", labelcolor=INK_2)
+    _style(ax, "A alta está nos contratos novos", "% de contratos encerrados por mês, por idade do contrato")
+    fig.tight_layout(); fig.savefig(OUT / "g2_idade.png", dpi=170); plt.close(fig)
+
+    # 3. paradoxo: índice de uso e distribuição de CSAT
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.6), gridspec_kw={"width_ratios": [1.25, 1]})
+    ax = axes[0]
+    q = [p.replace("20", "", 1) for p in paradox.trimestre]
+    for (col, lab), color in zip([("contas", "contas"), ("uso_total", "uso total"), ("uso_por_conta", "uso por conta")], SERIES3):
+        idx = paradox[col] / paradox[col].iloc[0] * 100
+        ax.plot(q, idx, color=color, linewidth=2, solid_capstyle="round")
+        ax.scatter(q[-1], idx.iloc[-1], s=36, color=color, edgecolor=SURFACE, linewidth=2, zorder=3)
+        ax.text(len(q) - 0.85, idx.iloc[-1], f"{lab} {idx.iloc[-1]:.0f}", va="center", fontsize=8.5, color=INK)
+    ax.set_yscale("log")
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:.0f}"))
+    ax.set_xlim(-0.3, len(q) + 1.6)
+    ax.tick_params(axis="x", labelsize=8)
+    _style(ax, "Base 9x maior, uso total igual", "índice, 1º tri/23 = 100, escala log")
+    ax = axes[1]
     counts = [int((tix_scores == n).sum()) for n in range(1, 6)] + [int(tix_scores.isna().sum())]
-    axes[1].bar(["1", "2", "3", "4", "5", "sem\nresposta"], counts, color=["#9ca3af"] * 5 + ["#b91c1c"])
-    axes[1].set_title("Satisfação: não existe nota 1 ou 2")
-    fig.tight_layout(); fig.savefig(OUT / "g3_paradoxo.png", dpi=150); plt.close(fig)
+    labs = ["1", "2", "3", "4", "5", "sem\nresp."]
+    ax.bar(range(6), counts, width=0.55, color=[BEFORE] * 5 + [AFTER], linewidth=0)
+    for i, c in enumerate(counts):
+        ax.text(i, c + 15, str(c), ha="center", fontsize=8.5, color=INK if c else MUTED)
+    ax.set_xticks(range(6), labs, fontsize=8.5)
+    _style(ax, "Satisfação sem notas 1 e 2", "tickets por nota de CSAT")
+    fig.tight_layout(); fig.savefig(OUT / "g3_paradoxo.png", dpi=170); plt.close(fig)
+    pd.DataFrame({"nota": ["1", "2", "3", "4", "5", "sem resposta"], "tickets": counts}).to_csv(OUT / "csat.csv", index=False)
 
 
 def main():

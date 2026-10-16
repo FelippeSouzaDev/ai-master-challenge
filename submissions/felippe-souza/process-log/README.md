@@ -48,6 +48,15 @@ Como o raciocínio andou, incluindo os caminhos errados:
 - **Correções nesta fase:** decimal com ponto nos KPIs (o resto estava em pt-BR). A coluna "Plano" saiu do painel porque a auditoria mostrou que `accounts.plan_tier` bate com o contrato em só 34% dos casos. Mostrar "Basic" numa conta de US$ 75 mil de MRR confundiria o CS. "191 clientes" virou "154 contas", porque os 191 são contratos, não contas.
 - **Reprodutibilidade:** o pipeline inteiro foi rodado de novo (download → auditoria → análise → impacto → painel), e os números dos documentos foram conferidos contra a saída.
 
+### 5. Revisão do layout
+
+- **Meu feedback:** achei o painel visualmente simples demais para uma entrega executiva.
+- **Decisão minha:** design próprio, neutro, sem identidade de empresa. Descartei usar o padrão visual do meu trabalho atual (levaria outra marca para um repositório público) e imitar a identidade do G4.
+- O painel virou [`solution/output/relatorio.html`](../solution/output/relatorio.html): relatório executivo e fila de risco num arquivo só, gerado por [`solution/04_report.py`](../solution/04_report.py) a partir de [`solution/report_template.html`](../solution/report_template.html). Os gráficos são SVG desenhados no navegador, sem biblioteca externa, cada um com tooltip e tabela de dados. Os PNGs do Markdown foram refeitos no mesmo padrão.
+- **Paleta validada por script, não no olho:** rodei o validador de daltonismo e contraste nas cores dos gráficos, nos modos claro e escuro. Azul × vermelho passa com folga. O par de 3 séries passa em todos os testes, mas o verde fica abaixo de 3:1 de contraste no modo claro. Por isso o gráfico leva rótulo direto no fim de cada linha, além da legenda.
+- **Erros encontrados na conferência visual:** o eixo Y mostrava "8%" numa linha que era 7,5%, e a barra de 7,9% parecia passar do tique. Troquei por passos redondos (1, 2 ou 5 × 10ⁿ). Os rótulos "nov/24" e "dez/24" se sobrepunham. Os meses dos PNGs saíam em inglês ("aug", "sep").
+- Testado no navegador embutido em desktop, mobile (375 px, sem rolagem horizontal) e modo escuro, com tooltip e filtros funcionando.
+
 ## Decisões
 
 | # | Decisão | Alternativas | Escolha | Por quê |
@@ -56,4 +65,5 @@ Como o raciocínio andou, incluindo os caminhos errados:
 | 2 | Auditar antes de analisar | ir direto para a análise | auditar | O dado falha em silêncio |
 | 3 | Definição de churn | A) receita via assinaturas encerradas; B) só `accounts.churn_flag`; C) `churn_events` | A, com B como churn "oficial" de logo e C só como evidência de processo | Única fonte em que fim e flag batem 100%. Delegado à IA após ler a auditoria, aceitei a recomendação |
 | 4 | Entregar modelo preditivo? | modelo com AUC ~0,5; lista por idade do contrato | lista por idade | Modelo sem poder preditivo passaria uma confiança falsa |
+| 6 | Identidade visual | padrão da empresa atual; inspirado no G4; design próprio | design próprio | Não levar marca de terceiros para um repositório público |
 | 5 | Ponto de corte do regime | data escolhida no olho; teste formal | ago/24, confirmado pelo teste de mix | É o primeiro mês com p < 0,05 e a razão sobe todo mês depois dele |

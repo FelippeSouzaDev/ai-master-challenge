@@ -50,4 +50,4 @@ Ninguém está mentindo. Os três times olham instrumentos que não enxergam o p
 
 ---
 
-Detalhes e testes: [auditoria de dados](../docs/01-auditoria-de-dados.md) · [diagnóstico completo](../docs/02-diagnostico.md) · [lista de contas em risco](output/contas_em_risco.csv) · [painel interativo](output/painel-risco.html)
+Detalhes e testes: [auditoria de dados](../docs/01-auditoria-de-dados.md) · [diagnóstico completo](../docs/02-diagnostico.md) · [lista de contas em risco](output/contas_em_risco.csv) · [relatório interativo](output/relatorio.html)

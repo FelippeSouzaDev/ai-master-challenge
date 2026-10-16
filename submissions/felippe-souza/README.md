@@ -12,7 +12,7 @@
 
 O churn da RavenStack não subiu porque clientes antigos estão indo embora. Subiu porque **contratos novos estão quebrando no primeiro mês**: desde agosto de 2024, um contrato com até 30 dias encerra a 7,9% ao mês, contra 0,66% antes (12x). Contratos com mais de 6 meses seguem na mesma taxa. A alta é igual em todos os segmentos e não é explicada por preço, uso, suporte nem mix da base. Ela aponta para uma mudança na forma de vender ou implantar, que nenhuma das 5 tabelas registra. O paradoxo do CEO tem explicação nos instrumentos: a pesquisa de satisfação não tem notas 1 e 2, o uso total está parado enquanto a base cresceu 9x, e o motivo de saída é ruído. **Recomendação principal:** investigar esta semana o que mudou em agosto em vendas e implantação, e atacar já a fila das 81 contas que concentram 50% do risco do próximo mês.
 
-**Para o CEO, ler primeiro:** [`solution/relatorio-executivo.md`](solution/relatorio-executivo.md) (5 minutos).
+**Para o CEO, ler primeiro:** baixe e abra [`solution/output/relatorio.html`](solution/output/relatorio.html) no navegador (5 minutos). No GitHub, a versão em texto é [`solution/relatorio-executivo.md`](solution/relatorio-executivo.md).
 
 ---
 
@@ -20,8 +20,8 @@ O churn da RavenStack não subiu porque clientes antigos estão indo embora. Sub
 
 | Arquivo | O que é |
 |---|---|
-| [`solution/relatorio-executivo.md`](solution/relatorio-executivo.md) | Relatório para o CEO: causa, paradoxo, 6 ações priorizadas com impacto, o que não fazer |
-| [`solution/output/painel-risco.html`](solution/output/painel-risco.html) | Painel autocontido para o CS: fila de contas em risco com filtros. Abre no navegador, sem servidor |
+| [`solution/output/relatorio.html`](solution/output/relatorio.html) | **Entrega principal.** Relatório interativo para o CEO e fila de risco para o CS num arquivo só: gráficos com tooltip e tabela de dados, hipóteses descartadas, plano de ação, fila filtrável com exportação CSV, modo claro e escuro. Abre no navegador, sem servidor e sem internet |
+| [`solution/relatorio-executivo.md`](solution/relatorio-executivo.md) | O mesmo relatório em Markdown, para ler direto no GitHub |
 | [`solution/output/contas_em_risco.csv`](solution/output/contas_em_risco.csv) | Lista das 500 contas com o MRR em risco nos próximos 30 dias |
 | [`docs/01-auditoria-de-dados.md`](docs/01-auditoria-de-dados.md) | Auditoria: três definições de churn que discordam, uso fora da janela do contrato, escala de CSAT truncada |
 | [`docs/02-diagnostico.md`](docs/02-diagnostico.md) | Diagnóstico completo com todas as hipóteses testadas, incluindo as descartadas |
@@ -37,7 +37,7 @@ python solution/fetch_data.py      # baixa os 5 CSVs do Kaggle (público, sem lo
 python solution/01_audit.py        # auditoria de dados
 python solution/02_analysis.py     # diagnóstico, gráficos e lista de risco (~1 minuto)
 python solution/03_impact.py       # impacto estimado das ações
-python solution/04_dashboard.py    # gera o painel HTML
+python solution/04_report.py       # gera solution/output/relatorio.html
 ```
 
 Rodar a partir da pasta `submissions/felippe-souza/`. Os dados ficam em `data/`, fora do git.
@@ -92,8 +92,8 @@ Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa e
 
 | Ferramenta | Para que usou |
 |------------|--------------|
-| Claude Code (desktop, Claude Opus 5.5) | Leitura do desafio e da vaga, download dos dados, scripts de auditoria e análise, testes estatísticos, gráficos, painel e redação |
-| Navegador embutido do Claude Code | Leitura da página da vaga e conferência visual do painel |
+| Claude Code (desktop, Claude Opus 5.5) | Leitura do desafio e da vaga, download dos dados, scripts de auditoria e análise, testes estatísticos, gráficos, relatório HTML e redação |
+| Navegador embutido do Claude Code | Leitura da página da vaga e conferência visual do relatório (desktop, mobile, modo escuro) |
 | Git + GitHub CLI | Fork, branch e um commit por fase |
 
 ### Workflow
@@ -103,7 +103,7 @@ Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa e
 3. **Auditoria:** a IA escreveu as checagens; o achado das três definições de churn mudou o rumo do trabalho. Escolhi a definição por receita.
 4. **Exploração:** muitas hipóteses rodadas em scripts descartáveis. O que sobreviveu foi para `02_analysis.py`.
 5. **Tentativa de derrubar cada achado:** mix, segmento, troca de contrato, previsibilidade. Cada um com teste formal.
-6. **Impacto, relatório e painel:** números conferidos contra a saída do script antes de entrar no texto.
+6. **Impacto e relatório:** números conferidos contra a saída do script antes de entrar no texto.
 
 ### Onde a IA errou e como corrigi
 
@@ -113,7 +113,7 @@ Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa e
 - **Correlação espúria:** "quem usa mais perde mais receita" era exposição (mais contratos = mais uso e mais encerramentos).
 - **Troca de contrato superestimada:** 66% parecia muito; o placebo mostrou que 53% é acaso.
 - **Afirmação errada no texto:** "de 5 a 16 contratos jovens por conta" no top 50. Conferido, o mínimo é 1. Corrigido.
-- **Erros de código:** comparação de séries do pandas com índices desalinhados, gráfico com escalas misturadas, contagens fixas no código, plano da conta (não confiável segundo a auditoria) exibido no painel.
+- **Erros de código:** comparação de séries do pandas com índices desalinhados, gráfico com escalas misturadas, contagens fixas no código, plano da conta (não confiável segundo a auditoria) exibido no painel; eixo Y do HTML com tiques fracionários arredondados para baixo ("8%" numa linha que era 7,5%); rótulos de mês sobrepostos.
 
 ### O que eu adicionei que a IA sozinha não faria
 
@@ -131,7 +131,7 @@ Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa e
 - [x] Chat export: [`process-log/chat-exports/`](process-log/chat-exports/)
 - [x] Git history: um commit por fase nesta branch
 - [x] Narrativa escrita: [`process-log/README.md`](process-log/README.md)
-- [x] Scripts reproduzíveis: `solution/01_audit.py` a `solution/04_dashboard.py`
+- [x] Scripts reproduzíveis: `solution/01_audit.py` a `solution/04_report.py`
 
 ---
 

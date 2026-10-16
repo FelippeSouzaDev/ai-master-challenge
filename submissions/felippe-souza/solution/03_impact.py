@@ -7,6 +7,7 @@ Uso:
     python solution/03_impact.py
 """
 import importlib.util
+import json
 from pathlib import Path
 
 import numpy as np
@@ -73,9 +74,21 @@ def main():
     # 4. Capacidade: quantas contas por semana a fila de implantação exige
     g = pd.read_csv(ROOT / "output" / "contas_em_risco.csv")
     cum = g.mrr_em_risco_30d.cumsum() / g.mrr_em_risco_30d.sum()
+    cover = {}
     for share in (0.5, 0.8):
-        n = int((cum < share).sum()) + 1
-        print(f"Contas para cobrir {share:.0%} do risco de 30 dias: {n}")
+        cover[share] = int((cum < share).sum()) + 1
+        print(f"Contas para cobrir {share:.0%} do risco de 30 dias: {cover[share]}")
+
+    # Números consumidos pelo relatório HTML (04_report.py)
+    impact = dict(mrr_perdido_regime=float(lost.mrr_amount.sum()), contratos_perdidos_regime=int(len(lost)),
+                  excesso_mrr=float(excess_events * avg_mrr), excesso_pct=float(excess_events / len(lost)),
+                  perda_3m_atual=float(cur), perda_3m_metade=float(mid), perda_3m_antigo=float(old),
+                  mrr_vendido_dez=float(mrr_new), sobrevivencia_90d_atual=float(surv_after),
+                  sobrevivencia_90d_antigo=float(surv_before), ganho_por_safra=float(mrr_new * (surv_before - surv_after)),
+                  contas_50pct=cover[0.5], contas_80pct=cover[0.8],
+                  mrr_ativo=float(act.mrr_amount.sum()), mrr_ate_90d=float(act[act.idade < 90].mrr_amount.sum()),
+                  risco_30d=float(g.mrr_em_risco_30d.sum()))
+    (ROOT / "output" / "impacto.json").write_text(json.dumps(impact, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":
