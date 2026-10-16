@@ -40,6 +40,14 @@ Como o raciocínio andou, incluindo os caminhos errados:
 8. **Modelo preditivo:** AUC de 0,475, contra 0,498 com rótulo embaralhado. Decidi **não** entregar um "modelo de churn" que na prática é aleatório. Em vez dele, a lista de risco usa a única variável que discrimina: a idade do contrato no regime atual.
 9. **Erros de código da IA corrigidos:** gráfico de uso misturando escalas (troquei por índice em escala log) e contagens de satisfação fixas no código (agora calculadas do dado). Revisei os números do documento contra a saída do script e corrigi uma afirmação errada: "de 5 a 16 contratos jovens por conta" virou "mediana de 8, de 1 a 16".
 
+### 4. Impacto, recomendações e entrega
+
+- [`solution/03_impact.py`](../solution/03_impact.py) transforma as taxas por idade em dinheiro: o excesso de MRR perdido desde ago/24, a perda dos próximos 3 meses em três cenários e o custo por safra mensal de vendas.
+- [`solution/relatorio-executivo.md`](../solution/relatorio-executivo.md): uma página para o CEO, com ações em ordem, dono, prazo e impacto, mais uma seção "o que NÃO fazer". Essa seção existe porque, com o dado que existe, as respostas óbvias (desconto, roadmap pelo formulário, campanha por segmento, modelo preditivo) desperdiçariam dinheiro.
+- [`solution/04_dashboard.py`](../solution/04_dashboard.py) gera um painel HTML autocontido para o CS, conferido no navegador (filtros e ordenação testados).
+- **Correções nesta fase:** decimal com ponto nos KPIs (o resto estava em pt-BR). A coluna "Plano" saiu do painel porque a auditoria mostrou que `accounts.plan_tier` bate com o contrato em só 34% dos casos. Mostrar "Basic" numa conta de US$ 75 mil de MRR confundiria o CS. "191 clientes" virou "154 contas", porque os 191 são contratos, não contas.
+- **Reprodutibilidade:** o pipeline inteiro foi rodado de novo (download → auditoria → análise → impacto → painel), e os números dos documentos foram conferidos contra a saída.
+
 ## Decisões
 
 | # | Decisão | Alternativas | Escolha | Por quê |
