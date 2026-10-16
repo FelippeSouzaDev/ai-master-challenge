@@ -2,7 +2,7 @@
 
 Registro de como o trabalho foi feito, de quem decidiu o quê e de onde a IA errou ou foi corrigida.
 
-**Ferramenta principal:** Claude Code (app desktop) com Claude Opus 5.5. A conversa completa é exportada em `chat-exports/` no final. O git history desta branch mostra a evolução por fase.
+**Ferramenta principal:** Claude Code (app desktop) com Claude Opus 5.5. A conversa não é publicada (ver seção 6). O git history desta branch mostra a evolução por fase.
 
 **Divisão de papéis:** eu (Felippe) defino o problema, escolho entre as alternativas e valido as conclusões contra o que conheço de cobrança e inadimplência. A IA escreve o código, roda as checagens e propõe interpretações, que eu aceito, ajusto ou recuso.
 
@@ -56,6 +56,11 @@ Como o raciocínio andou, incluindo os caminhos errados:
 - **Paleta validada por script, não no olho:** rodei o validador de daltonismo e contraste nas cores dos gráficos, nos modos claro e escuro. Azul × vermelho passa com folga. O par de 3 séries passa em todos os testes, mas o verde fica abaixo de 3:1 de contraste no modo claro. Por isso o gráfico leva rótulo direto no fim de cada linha, além da legenda.
 - **Erros encontrados na conferência visual:** o eixo Y mostrava "8%" numa linha que era 7,5%, e a barra de 7,9% parecia passar do tique. Troquei por passos redondos (1, 2 ou 5 × 10ⁿ). Os rótulos "nov/24" e "dez/24" se sobrepunham. Os meses dos PNGs saíam em inglês ("aug", "sep").
 - Testado no navegador embutido em desktop, mobile (375 px, sem rolagem horizontal) e modo escuro, com tooltip e filtros funcionando.
+
+### 6. Envio
+
+- **A conversa não é publicada.** A sessão rodou no meu ambiente de trabalho, e o contexto dela incluía dados internos do meu empregador. Decidi não publicar o export, nem mesmo uma versão higienizada. A evidência do processo é este registro, o git history (um commit por fase) e os scripts, que reproduzem cada número.
+- O `.gitignore` do repositório original ignora `submissions/`, e a regra do PR proíbe alterar arquivos fora da pasta. Os arquivos foram adicionados com `git add -f`, um a um, sem os CSVs do Kaggle (recriados por `fetch_data.py`).
 
 ## Decisões
 

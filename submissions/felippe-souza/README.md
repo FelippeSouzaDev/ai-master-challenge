@@ -3,7 +3,7 @@
 ## Sobre mim
 
 - **Nome:** Felippe Silva de Souza
-- **LinkedIn:** <!-- FELIPPE: preencher -->
+- **LinkedIn:** [linkedin.com/in/felippe-s-souza](https://www.linkedin.com/in/felippe-s-souza)
 - **Challenge escolhido:** 001 — Diagnóstico de Churn
 
 ---
@@ -86,7 +86,7 @@ Em ordem. Detalhe e impacto no [relatório executivo](solution/relatorio-executi
 
 ## Process Log — Como usei IA
 
-Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa exportada em [`process-log/chat-exports/`](process-log/chat-exports/).
+Detalhe completo em [`process-log/README.md`](process-log/README.md). A conversa com a IA não é publicada, porque a sessão rodou no meu ambiente de trabalho, com dados internos do meu empregador no contexto. A evidência é o process log, o git history e os scripts.
 
 ### Ferramentas usadas
 
@@ -117,22 +117,23 @@ Detalhe completo em [`process-log/README.md`](process-log/README.md). Conversa e
 
 ### O que eu adicionei que a IA sozinha não faria
 
-<!-- FELIPPE: revisar e reescrever com as suas palavras. Abaixo, um rascunho com base no que aconteceu nesta conversa. -->
+Sendo direto sobre a divisão: a IA escreveu o código, rodou os testes e redigiu os textos. O meu papel foi decidir o que fazer, em que ordem e o que podia ou não sair daqui.
 
-- **Desconfiar do dado antes de analisar.** No meu ambiente o dado falha em silêncio: o número sai errado, não ausente. Por isso a auditoria veio antes de tudo, e foi ela que mostrou que "churn" tinha três respostas diferentes.
-- **Medir em receita, não em contagem.** Em cobrança, perder um contrato de US$ 50 não é perder um de US$ 5 mil. A definição por MRR veio daí.
-- **Não entregar um modelo que não funciona.** Um modelo com AUC de 0,475 bem apresentado passaria no olho de quem não testa. Preferi dizer que o dado não tem o sinal e entregar uma fila baseada na única variável que discrimina.
-- **Comissão atrelada à permanência do contrato.** <!-- FELIPPE: confirmar se é um mecanismo que você conhece da prática e descrever em uma frase. -->
+- **Desconfiar do dado antes de analisar.** No ambiente onde trabalho o dado falha em silêncio: o número sai errado, não ausente. Coloquei a auditoria como condição do plano, e foi ela que mostrou que "churn" tinha três respostas diferentes. Sem isso, a análise teria partido de um número arbitrário.
+- **Medir em receita, não em contagem.** Venho de Controladoria e cobrança: perder um contrato de US$ 50 não é perder um de US$ 5 mil. Aprovei a definição de churn por MRR por esse critério.
+- **Não entregar um modelo que não funciona.** Um modelo com AUC de 0,475 bem apresentado passaria no olho de quem não testa. A entrega diz que o dado não tem o sinal e usa a única variável que discrimina: a idade do contrato.
+- **Recomendações que mexem em incentivo, não só em processo.** Se a alta está no contrato recém-vendido, o incentivo de quem vende é parte do problema. Atrelar a comissão à permanência do contrato faz a venda ruim custar para quem vende. É uma regra simples de implementar no fechamento da folha de comissões.
+- **Barra de qualidade na entrega.** Recusei a primeira versão do painel por ser simples demais para um executivo e escolhi um design neutro, sem a identidade do meu empregador nem a do G4.
+- **O que não podia ir para um repositório público.** A sessão rodou no meu ambiente de trabalho, que tem dados internos no contexto (servidores, sistemas, e-mail). Por isso a conversa com a IA não foi publicada, e cada passo público (fork, push, PR) só aconteceu com a minha autorização.
 
 ---
 
 ## Evidências
 
-- [x] Chat export: [`process-log/chat-exports/`](process-log/chat-exports/)
 - [x] Git history: um commit por fase nesta branch
 - [x] Narrativa escrita: [`process-log/README.md`](process-log/README.md)
 - [x] Scripts reproduzíveis: `solution/01_audit.py` a `solution/04_report.py`
 
 ---
 
-_Submissão enviada em: <!-- data do PR -->_
+_Submissão enviada em: 16/10/2026_
