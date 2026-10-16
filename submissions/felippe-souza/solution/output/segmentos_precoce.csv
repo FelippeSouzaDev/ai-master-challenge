@@ -1,0 +1,10 @@
+variavel,p_valor,menor,maior
+plan_tier,0.638,Enterprise 4.1%,Basic 5.2%
+billing_frequency,0.565,monthly 4.3%,annual 5.0%
+auto_renew_flag,0.353,True 4.4%,False 5.7%
+is_trial,0.454,True 3.7%,False 4.8%
+upgrade_flag,0.924,True 4.3%,False 4.7%
+downgrade_flag,0.674,False 4.6%,True 6.2%
+industry,0.738,EdTech 3.3%,DevTools 5.2%
+referral_source,0.571,event 3.6%,organic 5.9%
+country,0.932,DE 3.3%,CA 6.8%
